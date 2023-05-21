@@ -38,6 +38,17 @@ async function run() {
       res.send(result)
     
     })  
+
+       app.get('/toys',async(req,res)=>{
+        console.log(req.query.email);  
+        let query={};
+        if(req.query?.email){
+          query={selleremail:req.query.email}
+        } 
+      const result=await toyCollection.find(query).toArray();
+      res.send(result)
+    })
+  
     
     app.get('/alltoys/:category',async(req,res)=>{
       console.log(req.params.category)
@@ -51,7 +62,19 @@ async function run() {
         res.send(result);
       }
       
-   
+  
+    //  app.get('/toys',async(req,res)=>{
+    //   console.log(req.query.email);
+    //   let query={}
+    //   if(req.query?.email){
+    //     query={selleremail : req.query.email}
+    //   }
+    //   const result=await toyCollection.find(query).toArray();
+    //   res.send(result);
+    //  })
+
+  
+      
    
     })
 
