@@ -31,6 +31,22 @@ async function run() {
 
     const toyCollection=client.db('toyPlace').collection('toys');
 
+    const indexKeys={title:1,category:1};
+    const indexOptions={name:"titleCategory"};
+
+    const result=await toyCollection.createIndex(indexKeys,indexOptions);
+
+    app.get('/toys/:text',async(req,res)=>{
+      const searchText=req.params.text;
+      const result=await toyCollection.find({
+   $or:[
+    {name:{$regex:searchText,$options:"i"}},
+    {subCategory:{$regex:searchText,$options:"i"}},
+   ],
+      }).toArray();
+      res.send(result);
+    })
+
     app.post('/addtoy',async(req,res)=>{
       const body=req.body;
       body.createdAt=new Date();
@@ -40,12 +56,6 @@ async function run() {
     })  
 
     app.get('/toys',async(req,res)=>{
-      const result=await toyCollection.find().toArray()
-      res.send(result)
-
-    })
-
-       app.get('/toys',async(req,res)=>{
         console.log(req.query.email);  
         let query={};
         if(req.query?.email){
@@ -55,18 +65,54 @@ async function run() {
       res.send(result)
     })
 
+    // app.get('/toys/:name',async(req,res)=>{
+    //   const id=req.params.id;
+    //   const query={_id:new ObjectId(id)}
+    //   const result=await toyCollection.findOne(query)
+    //   res.send(result)
+    // })
+
+
+    app.get('/toys',async(req,res)=>{
+      const result=await toyCollection.find().toArray()
+      res.send(result)
+     
+    })
+
+
+
+  app.get('/toys/:_id', (req, res) => {
+  const toyName = req.params.name;
+  const toy = toys.find(toy => toy.name === toyName);
+  if (toy) {
+    res.json(toy);
+  } else {
+    res.status(404).json({ error: 'Toy not found' });
+  }
+});
+
+
+   
+    
+  
+
+       
     app.patch('/toys/:id',async(req,res)=>{
       const id=req.params.id;
       const filter={_id:new ObjectId(id)};
+      const options={upsert:true};
 
       const updatedToy=req.body;
-      console.log(updatedToy);
-      const updatedDoc={
+      // console.log(updatedToy);
+      const toy={
         $set:{
-         status:updatedToy.status
+         price:updatedToy.price,
+        quantity:updatedToy.quantity,
+        description:updatedToy.description 
+
         },
       };
-      const result=await toyCollection.updateOne(filter,updatedDoc);
+      const result=await toyCollection.updateOne(filter,toy,options);
       res.send(result)
     })
      
