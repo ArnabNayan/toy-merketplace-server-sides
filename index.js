@@ -61,17 +61,11 @@ async function run() {
         if(req.query?.email){
           query={selleremail:req.query.email}
         } 
-      const result=await toyCollection.find(query).toArray();
+      const result=await toyCollection.find(query).sort({createdAt: -1}).toArray();
       res.send(result)
     })
 
-    // app.get('/toys/:name',async(req,res)=>{
-    //   const id=req.params.id;
-    //   const query={_id:new ObjectId(id)}
-    //   const result=await toyCollection.findOne(query)
-    //   res.send(result)
-    // })
-
+  
 
     app.get('/toys',async(req,res)=>{
       const result=await toyCollection.find().toArray()
@@ -125,7 +119,7 @@ async function run() {
     })
 
   
-    app.get('/alltoys/:category',async(req,res)=>{
+    app.get('/toys/:category',async(req,res)=>{
       console.log(req.params.category)
       if(req.params.category=='avengers'||req.params.category=='marvel'||req.params.category=='transformers'){
         const result=await toyCollection.find({ subCategory: req.params.category}).toArray();
